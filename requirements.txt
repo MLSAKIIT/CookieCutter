@@ -1,0 +1,3 @@
+cvzone
+numpy
+opencv-python
