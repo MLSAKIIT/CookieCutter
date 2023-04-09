@@ -44,7 +44,6 @@ while not gameOver:
     _, img = cam.read()
     img = cv2.flip(img,1)#mirror the camera
     hands,img = detector.findHands(img, flipType = False) #no need to flip the hands as the camera is already flipped
-    time =0 
     h,w,_ = sqr_img.shape #gets the height,weight and ignores the colors
     img = overlayPNG(img,sqr_img,[pox,poy])#overlay the cookie image
     img = overlayPNG(img,mlsa,[0,0])#overlay the mlsa image to the top left corner
@@ -59,7 +58,6 @@ while not gameOver:
                 cb, cg, cr = img[smoothY, smoothX, 0], img[smoothY, smoothX, 1], img[smoothY, smoothX, 2]
                 #get the bgr color combination of the pointer
                 if cb == b and cg == g and cr == r: #check if on the path
-                    time=time +1
                     if prevX!=cursor[0] and prevY!=cursor[1]:
                         if prevX == 0 and prevY == 0:
                             prevX, prevY = cursor[0], cursor[1]#set the initial cursor when inside cookie
@@ -88,7 +86,7 @@ while not gameOver:
                     cv2.line(canvas, (prevX, prevY), (smoothX, smoothY), (255, 255, 0), thickness=9)
                 else:
                     mistakes += 1
-                    if mistakes == 10 or time == 1:
+                    if mistakes == 10:
                         print("lose")
                         corners = [0, 0, 0, 0] #resets the checkpoints
                         canvas = np.zeros((480, 640, 3), np.uint8) # remove green lines

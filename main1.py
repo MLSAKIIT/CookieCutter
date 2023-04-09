@@ -8,23 +8,24 @@ cam = cv2.VideoCapture(0)
 detector = HandTrackingModule.HandDetector(maxHands=1,detectionCon=0.77)
 sqr_img = cv2.imread("img\sqr(2).png", cv2.IMREAD_UNCHANGED)
 mlsa = cv2.imread("img\mlsa.png", cv2.IMREAD_UNCHANGED)
-sqr_img = cv2.resize(sqr_img, (270, 230), interpolation=cv2.INTER_AREA)
-mlsa = cv2.resize(mlsa, (90, 80), interpolation=cv2.INTER_AREA)
-pox, poy = 160,160
+sqr_img = cv2.resize(sqr_img, (270, 230), interpolation=cv2.INTER_AREA)#cookie
+mlsa = cv2.resize(mlsa, (90, 80), interpolation=cv2.INTER_AREA)#msc_logo
+pox, poy = 160,160#centering the image
 b,g,r = 27,74,114 
 prevX,prevY =0,0
 finishX,finishY =0,0
 NotWon = True
+gameOver = False
 smoothX ,smoothY = 0,0
 canvas = np.zeros((480,640,3),np.uint8)
-smoothing = 3
-corners = [0,0,0,0]
-mistakes =0 
+smoothing = 2#smoothing is applied to the hand movements
+corners = [0,0,0,0] #initial corners
+mistakes =0 #initializing mistakes
 while True:
     cv2.imshow('Squid Game', cv2.resize(intro, (640,480), interpolation=cv2.INTER_AREA))
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-while NotWon:
+while not gameOver:
     _, img = cam.read()
     img = cv2.flip(img,1)#mirror the camera
     hands,img = detector.findHands(img, flipType = False) #no need to flip the hands as the camera is already flipped
@@ -50,6 +51,7 @@ while NotWon:
                             if corners == [1,1,1,1]:
                                 print("Win")
                                 NotWon = False 
+                                gameOver =True
                 elif cb == 26 and cg == g and cr == r:#corner 0 check
                     corners[0] = 1
                     cv2.line(canvas, (prevX, prevY), (smoothX, smoothY), (255, 255, 0), thickness=9)
@@ -64,7 +66,7 @@ while NotWon:
                     cv2.line(canvas, (prevX, prevY), (smoothX, smoothY), (255, 255, 0), thickness=9)
                 else:
                     mistakes += 1
-                    if mistakes == 100:
+                    if mistakes == 10:
                         print("lose")
                         corners = [0, 0, 0, 0] #resets the checkpoints
                         canvas = np.zeros((480, 640, 3), np.uint8) # remove green lines
@@ -93,12 +95,10 @@ if NotWon:
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 else:
-
     cv2.imshow('Squid Game', cv2.resize(winner, (640,480), interpolation=cv2.INTER_AREA))
     cv2.waitKey(1)
     while True:
         cv2.imshow('Squid Game', cv2.resize(winner, (640,480), interpolation=cv2.INTER_AREA))
-        # cv2.imshow('shit',cv2.resize(graphic[3], (0, 0), fx = 0.5, fy = 0.5))
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 cv2.destroyAllWindows()
